@@ -35,3 +35,7 @@ header .brand{margin-inline-end:auto}header .brand b{margin:0;font-size:20px}
 .bar{height:8px;border-radius:8px;background:rgba(47,107,255,.15);overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--vio),var(--blue));transform-origin:left}
 details.card summary{cursor:pointer;font:600 18px Unbounded,sans-serif}
 .chip{display:inline-block;padding:6px 14px;margin:4px;border-radius:999px;background:rgba(255,255,255,.6);border:1px solid var(--edge);font-size:14px}.bar i{transition:transform .4s}
+
+.brand{display:flex;align-items:center;gap:10px}.brand span{color:#5D61F6}.brand img{border-radius:9px}
+[dir=rtl] .bar i{transform-origin:right}.chips{min-height:46px;margin:8px 0;padding:4px 0;border-bottom:1px dashed rgba(47,107,255,.35)}
+button.chip{cursor:pointer;font:inherit;color:var(--ink)}hr{border:0;border-top:1px solid rgba(47,107,255,.2);margin:18px 0}ul{padding-inline-start:20px}

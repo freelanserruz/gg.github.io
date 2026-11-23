@@ -58,7 +58,8 @@ Object.assign(L.ar,{games:"ألعاب",guides:"أدلة",startb:"ابدأ",p:"ت
 Object.assign(L.tr,{games:"Oyunlar",guides:"Rehberler",startb:"Başla",p:"İngilizce ve IELTS: testler, oyunlar ve her hatanın açıklaması."});
 Object.assign(L.kk,{games:"Ойындар",guides:"Нұсқаулықтар",startb:"Бастау",p:"Ағылшын және IELTS: тесттер, ойындар және әр қатенің талдауы."});
 if(window.Z2){const{K,Z,K0,Z0}=Z2;for(const l in Z){K.forEach((k,i)=>L[l][k]=Z[l].split("|")[i])}for(const l in Z0){K0.forEach((k,i)=>L[l][k]=Z0[l].split("|")[i])}}
-Object.keys(L).forEach(k=>L[k].brand="Tayyor");
+if(window.Z3){const{K,Z}=Z3;for(const l in Z){const v=Z[l].split("|");K.forEach((k,i)=>L[l][k]=v[i])}}
+Object.keys(L).forEach(k=>L[k].brand="Bandup");
 const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const lang=LANGS[ls("ep_lang","ru")]?ls("ep_lang","ru"):"ru";
@@ -66,8 +67,8 @@ const t=(k,v={})=>(L[lang][k]||L.ru[k]||k).replace(/\{(\w+)\}/g,(_,x)=>v[x]);
 const me=()=>ls("ep_user",null),users=()=>ls("ep_users",{});
 function addPoints(n){const u=me();if(!u)return false;const a=users();a[u.name]=(a[u.name]||0)+n;save("ep_users",a);return true}
 document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
-document.body.insertAdjacentHTML("afterbegin",`<i class="orb o1"></i><i class="orb o2"></i><header><div><a href="index.html" class="brand"><b>${t("brand")}</b></a><a href="games.html">${t("games")}</a><a href="guides.html">${t("guides")}</a><a href="rating.html">${t("rating")}</a><a href="login.html">${me()?me().name.replace(/</g,"&lt;"):t("login")}</a><select id="lg" aria-label="Language">${Object.entries(LANGS).map(([k,n])=>`<option value="${k}"${k===lang?" selected":""}>${n}</option>`).join("")}</select><a class="btn" href="start.html">${t("startb")}</a></div></header>`);
-document.getElementById("lg").onchange=e=>{save("ep_lang",e.target.value);location.reload()};
+document.body.insertAdjacentHTML("afterbegin",`<i class="orb o1"></i><i class="orb o2"></i><header><div><a href="index.html" class="brand"><img src="bandup-icon.svg" alt="" width="32" height="32"><b>Band<span>up</span></b></a><a href="games.html">${t("games")}</a><a href="guides.html">${t("guides")}</a><a href="rating.html">${t("rating")}</a><a href="login.html">${me()?me().name.replace(/</g,"&lt;"):t("login")}</a><select id="lg" aria-label="Language">${Object.entries(LANGS).map(([k,n])=>`<option value="${k}"${k===lang?" selected":""}>${n}</option>`).join("")}</select><a class="btn" href="start.html">${t("startb")}</a></div></header>`);
+document.getElementById("lg").onchange=e=>{save("ep_lang",e.target.value);if(/start\.html/.test(location.pathname))save("ep_resume",1);location.reload()};
 document.addEventListener("pointermove",e=>{const c=e.target.closest&&e.target.closest(".card");if(c){const r=c.getBoundingClientRect();c.style.setProperty("--mx",e.clientX-r.left+"px");c.style.setProperty("--my",e.clientY-r.top+"px")}});
 document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
 document.querySelectorAll("[data-p]").forEach(el=>el.placeholder=t(el.dataset.p));

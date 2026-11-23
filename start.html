@@ -1,35 +1,63 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=4"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=4"></script><script src="app.js?v=4"></script><script>
-const FL={english:["lang","why","level","before","hard","time","days","style","remind","source"],ielts:["lang","goal","format","branch","target","now","date","tries","hard","time","days","style","remind","source"]};
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=5"></script><script>
+const FRESH=()=>({bank:"",i:0,ans:{},prog:0,phase:"survey",d:{i:0,s:0,w:[],o:[]}});
+let S=FRESH(),pool=[],pick=[];
 const T=(ks,p="q_")=>ks.map(k=>[k,t(p+k)]);
-let bank="",i=0,ans={};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const persist=()=>save("ep_flow",S),bar=x=>pb.style.transform="scaleX("+x+")";
+const stg=n=>'<p class="tag">'+["q_s1","q_s2","q_s3"].map((k,j)=>j===n?"<b>"+t(k)+"</b>":t(k)).join(" · ")+"</p>";
 const D={lang:()=>({p:t("q_plang"),o:Object.entries(LANGS)}),
 why:()=>({p:t("q_pwhy"),o:T(["w1","w2","w3","w4","w5"])}),
 level:()=>({p:t("q_plevel"),o:T(["lv1","lv2","lv3","lv4"])}),
+can:()=>({p:t("q_pcan"),o:T(["cn1","cn2","cn3","cn4"])}),
 before:()=>({p:t("q_pbefore"),o:T(["b1","b2","b3","b4","b5"])}),
 goal:()=>({p:t("s2"),o:T(["g1","g2","g3","g4","g5"],"")}),
 format:()=>({p:t("s3"),o:[["academic","Academic"],["general","General Training"]]}),
-branch:()=>ans.format==="general"?{p:t("q_pgc"),o:T(["c1","c2","c3","c4"])}:{p:t("q_pba"),o:T(["ba1","ba2","ba3","ba4"])},
+branch:()=>S.ans.format==="general"?{p:t("q_pgc"),o:T(["c1","c2","c3","c4"])}:{p:t("q_pba"),o:T(["ba1","ba2","ba3","ba4"])},
 target:()=>({p:t("q_ptarget"),o:[["5.5","5.5"],["6.0","6.0"],["6.5","6.5"],["7.0","7.0"],["7.5","7.5+"],["dk",t("q_dk")]]}),
 now:()=>({p:t("q_pnow"),o:[["nw0",t("q_nw0")],["5","≤ 5.0"],["5.5","5.5–6.0"],["6.5","6.5–7.0"],["7.5","7.5+"]]}),
 date:()=>({p:t("q_pdate"),o:[["d1",t("q_d1")],["d2",t("q_d2")],["d3",t("q_d3")],["dk",t("q_dk")]]}),
 tries:()=>({p:t("q_ptries"),o:T(["t1","t2","t3"])}),
-hard:()=>({p:t("q_phard"),o:T(["hd1","hd2","hd3","hd4"].concat(bank==="english"?["hd5","hd6"]:[]))}),
-time:()=>({p:t("q_ptime"),o:(bank==="english"?[5,10,15,30]:[15,30,60,90]).map(n=>[n,t("q_umin",{n})])}),
+hard:()=>({p:t("q_phard"),o:T(["hd1","hd2","hd3","hd4"].concat(S.bank==="english"?["hd5","hd6"]:[]))}),
+time:()=>({p:t("q_ptime"),o:(S.bank==="english"?[5,10,15,30]:[15,30,60,90]).map(n=>[n,t("q_umin",{n})])}),
 days:()=>({p:t("q_pdays"),o:[3,5,7].map(n=>[n,t("q_udays",{n})])}),
 style:()=>({p:t("q_pstyle"),o:T(["st1","st2","st3","st4"])}),
 remind:()=>({p:t("q_premind"),o:T(["yes","no"])}),
 source:()=>({p:t("q_psource"),o:[["TikTok","TikTok"],["Instagram","Instagram"],["Telegram","Telegram"],...T(["so4","so5"])]})};
-const persist=()=>save("ep_flow",{bank,i,ans});
-function course(){pb.style.transform="scaleX(0)";w.innerHTML="<h2>"+t("s1")+'</h2><p class="tag">'+t("s1p")+'</p><button class="pick pv" data-b="english"><h3>'+t("eng")+"</h3><p>"+t("engd")+'</p></button><button class="pick pb" data-b="ielts"><h3>'+t("ielts")+"</h3><p>"+t("ieltsd")+"</p></button>"}
-function render(){const f=FL[bank];if(i>=f.length)return done();const d=D[f[i]]();pb.style.transform="scaleX("+(i/f.length)+")";
-w.innerHTML='<p class="tag">'+t("qof",{a:i+1,b:f.length})+"</p><h2>"+d.p+"</h2>"+d.o.map(([v,l])=>'<button class="opt" data-v="'+v+'">'+l+"</button>").join("")+'<p><button class="btn ghost" id="bk">'+t("back")+"</button></p>"}
-function done(){pb.style.transform="scaleX(1)";save("ep_plan",{bank,ans});const ch=FL[bank].filter(k=>k!=="lang").map(k=>{const o=D[k]().o.find(x=>String(x[0])===String(ans[k]));return '<span class="chip">'+(o?o[1]:ans[k])+"</span>"}).join("");
-w.innerHTML="<h2>"+t("q_done")+"</h2><p>"+t("q_donep")+"</p><p>"+ch+'</p><p><a class="btn" href="test.html?bank='+bank+'">'+t("q_check")+'</a> <a class="btn ghost" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+"</a></p>"}
-w.onclick=e=>{const b=e.target.closest("button");if(!b)return;
-if(b.dataset.b){bank=b.dataset.b;i=0;ans={};return render()}
-if(b.id==="bk"){if(i===0){bank="";return course()}i--;return render()}
-if(b.dataset.v!==undefined){const k=FL[bank][i];ans[k]=b.dataset.v;i++;persist();
-if(k==="lang"&&b.dataset.v!==lang){save("ep_lang",b.dataset.v);save("ep_resume",1);return location.reload()}render()}};
-if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}const f=ls("ep_flow",null);if(f&&FL[f.bank]){bank=f.bank;i=f.i;ans=f.ans}}
-bank?render():course();
+function FLW(){const a=S.ans,o=["lang"];
+if(S.bank==="english"){o.push("why","level");if(a.level==="lv2"||a.level==="lv3")o.push("can");if(a.level!=="lv1")o.push("before","hard");o.push("time","days","style","remind","source")}
+else{o.push("goal","format","branch","target","date","tries");if(a.tries&&a.tries!=="t1")o.push("now");o.push("hard","time","days","style","remind","source")}return o}
+const chips=()=>FLW().filter(k=>k!=="lang").map(k=>{const o=S.ans[k]!==undefined&&D[k]().o.find(x=>String(x[0])===String(S.ans[k]));return o?'<span class="chip">'+esc(o[1])+"</span>":""}).join("");
+function course(){bar(0);w.innerHTML="<h2>"+t("s1")+'</h2><p class="tag">'+t("s1p")+'</p><button class="pick pv" data-b="english"><h3>'+t("eng")+"</h3><p>"+t("engd")+'</p></button><button class="pick pb" data-b="ielts"><h3>'+t("ielts")+"</h3><p>"+t("ieltsd")+"</p></button>"}
+function survey(){const f=FLW();if(S.i>=f.length)return endSurvey();const d=D[f[S.i]]();S.prog=Math.max(S.prog,S.i/f.length);bar(.4*S.prog);
+w.innerHTML=stg(0)+'<p class="tag">'+t("q_step",{n:S.i+1})+"</p><h2>"+d.p+"</h2>"+d.o.map(([v,l])=>'<button class="opt" data-v="'+esc(v)+'">'+esc(l)+"</button>").join("")+'<p><button class="btn ghost" id="bk">'+t("back")+"</button></p>"}
+function endSurvey(){S.prog=1;if(S.bank==="english"){S.phase="diag";persist();return intro()}plan()}
+function intro(){bar(.4);w.innerHTML=stg(1)+"<h2>"+t("q_dt")+"</h2><p>"+t("q_dn")+'</p><button class="btn" data-a="ds">'+t("q_dstart")+"</button>"}
+function plan(extra=""){bar(1);S.phase="plan";persist();w.innerHTML=stg(2)+extra+"<h2>"+t("q_done")+"</h2><p>"+t("q_donep")+"</p><p>"+chips()+"</p>"+(S.bank==="ielts"?'<p class="tag">'+t("q_isoon")+"</p>":"")+'<p><a class="btn" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+"</a></p>"}
+const mc=(s,o,a,k)=>({h:t("q_choose"),t:s,o,a,k});
+const DQ=()=>[mc("I __ a student.",["am","is","are"],0,"tobe"),mc("She __ coffee every morning.",["drink","drinks","drinking"],1,"pres"),mc("They __ from Uzbekistan.",["is","are","am"],1,"tobe"),mc("We __ English yesterday.",["study","studied","studies"],1,"past"),mc("There __ a hotel near the station.",["is","are","am"],0,"there"),mc("I would like __ room, please.",["a","an","are"],0,"art"),mc("How __ to the airport?",["do I get","I get","am I get"],0,"qord"),mc("He __ to London last year.",["go","went","gone"],1,"past"),mc("I’m looking __ my passport.",["for","at","on"],0,"prep"),mc("If it rains, we __ a taxi.",["take","will take","took"],1,"cond"),mc("I have never __ sushi.",["eat","ate","eaten"],2,"perf"),mc("A hotel __ more expensive than a hostel.",["is","are","be"],0,"comp"),
+{h:t("q_q13"),t:"“Could you tell me when the next train leaves?”",o:[t("q_q13a"),t("q_q13b"),t("q_q13c")],a:0,k:"read"},
+{type:"order",h:t("q_order"),words:["Where","you","are","staying?"],ans:"Where are you staying?",k:"qord"},
+{h:t("q_q15"),t:"Anna is staying at a small hotel near the city centre. She arrived on Monday and will leave on Friday. Every morning, she walks to a nearby café for breakfast.",o:[t("q_q15a"),t("q_q15b"),t("q_q15c")],a:0,k:"read"}];
+function drawChips(){document.getElementById("pk").innerHTML=pick.map((x,j)=>'<button class="chip" data-r="'+j+'">'+esc(x)+"</button>").join("");document.getElementById("pl").innerHTML=pool.map((x,j)=>'<button class="chip" data-p="'+j+'">'+esc(x)+"</button>").join("")}
+function diag(){const d=S.d,Q=DQ();if(d.i>=Q.length)return result();const q=Q[d.i];bar(.4+.45*d.i/Q.length);let b;
+if(q.type==="order"){pool=q.words.slice().sort(()=>Math.random()-.5);pick=[];b='<div id="pk" class="chips"></div><div id="pl"></div><p><button class="btn" id="ck">'+t("q_check2")+"</button></p>"}
+else b="<h3>"+esc(q.t)+"</h3>"+q.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+esc(o)+"</button>").join("");
+w.innerHTML=stg(1)+'<p class="tag">'+(d.i+1)+" / "+Q.length+"</p><h2>"+q.h+"</h2>"+b+'<p id="fb" aria-live="polite"></p>';if(q.type==="order")drawChips()}
+function fin(ok,q,ct){const d=S.d;let h="";if(ok)d.s++;else{h=(d.w.includes(q.k)?t("q_again2")+" ":"")+t("q_hn_"+q.k);d.w.push(q.k)}d.o.push(ok?1:0);persist();
+document.getElementById("fb").innerHTML=(ok?t("ok"):t("no")+" "+(ct?esc(ct)+". ":"")+h)+'<br><br><button class="btn" id="nx">'+t(d.i+1<DQ().length?"next":"res")+"</button>"}
+function result(){const d=S.d,s=d.s,lv=s<=3?"A1":s<=7?"A1–A2":s<=11?"A2":s<=13?"A2–B1":"B1";const hs=[...new Set(d.w)].map(k=>"<li>"+t("q_hn_"+k)+"</li>").join("");
+plan("<h2>"+t("q_rt",{l:lv})+"</h2><p>"+t("q_sc",{n:s})+'</p><p class="tag">'+t("q_rn")+"</p>"+(hs?"<h3>"+t("q_rev")+"</h3><ul>"+hs+"</ul>":"<p>"+t("q_perf")+"</p>")+"<hr>")}
+w.onclick=e=>{const b=e.target.closest("button");if(!b)return;const D0=b.dataset;
+if(D0.b){S=FRESH();S.bank=D0.b;return survey()}
+if(b.id==="bk"){if(S.i===0){S.bank="";return course()}S.i--;return survey()}
+if(D0.v!==undefined){const k=FLW()[S.i];S.ans[k]=D0.v;S.i++;persist();if(k==="lang"&&D0.v!==lang){save("ep_lang",D0.v);save("ep_resume",1);return location.reload()}return survey()}
+if(D0.a==="ds"){S.d={i:0,s:0,w:[],o:[]};persist();return diag()}
+if(D0.j!==undefined){const q=DQ()[S.d.i],j=+D0.j;w.querySelectorAll(".opt").forEach((x,n)=>{x.disabled=true;x.classList.toggle("ok",n===q.a);if(n===j&&j!==q.a)x.classList.add("bad")});return fin(j===q.a,q,"")}
+if(D0.p!==undefined){pick.push(pool.splice(+D0.p,1)[0]);return drawChips()}
+if(D0.r!==undefined){pool.push(pick.splice(+D0.r,1)[0]);return drawChips()}
+if(b.id==="ck"){const q=DQ()[S.d.i];b.disabled=true;w.querySelectorAll(".chip").forEach(x=>x.disabled=true);return fin(pick.join(" ")===q.ans,q,q.ans)}
+if(b.id==="nx"){S.d.i++;persist();return diag()}};
+function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.d.o.length)return result();plan()}
+if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}const f=ls("ep_flow",null);if(f&&f.bank)S=Object.assign(FRESH(),f)}
+route();
 </script></body></html>

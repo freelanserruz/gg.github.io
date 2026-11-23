@@ -1,6 +1,9 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=4"></head><body><main><section class="hero"><h1 data-i="h1"></h1><div class="card" id="q"></div><a class="btn" href="start.html" data-i="begin"></a></section></main>
-<script src="i18n2.js?v=4"></script><script src="app.js?v=4"></script><script>
-const q=BANK.english.q[2],box=document.getElementById("q");
-box.innerHTML="<h3>"+q.t+"</h3>"+q.o.map((o,i)=>'<button class="opt" data-n="'+i+'">'+o+"</button>").join("")+'<p id="r" class="tag" aria-live="polite"></p>';
-box.onclick=e=>{const b=e.target.closest(".opt");if(!b)return;const i=+b.dataset.n;box.querySelectorAll(".opt").forEach((x,j)=>{x.classList.toggle("ok",j===q.a);if(j===i&&i!==q.a)x.classList.add("bad")});r.textContent=t(i===q.a?"ok":"no")+" "+q.e};
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><section class="hero"><h1 data-i="h1"></h1><div class="card" id="lg2"></div><a class="btn" href="start.html" data-i="begin"></a></section></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=5"></script><script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function draw(){const u=me();lg2.innerHTML=(u?"<h3>"+t("q_hello",{n:esc(u.name)})+"</h3>":"")+'<input id="nn" maxlength="20"> <button class="btn" id="sv"></button>';
+nn.placeholder=t("q_nick");nn.value=u?u.name:"";sv.textContent=u?t("q_chg"):t("login")}
+lg2.onclick=e=>{if(e.target.id!=="sv")return;const v=nn.value.trim().slice(0,20);if(!v)return nn.focus();const u=me(),a=users();
+if(u&&u.name!==v&&a[u.name]!==undefined&&a[v]===undefined){a[v]=a[u.name];delete a[u.name];save("ep_users",a)}
+save("ep_user",{name:v});location.reload()};
+draw();
 </script></body></html>

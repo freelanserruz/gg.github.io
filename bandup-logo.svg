@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="240" viewBox="0 0 960 240" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Bandup logo</title>
+  <desc id="desc">Bandup wordmark with an upward progress icon.</desc>
+  <defs>
+    <linearGradient id="brand" x1="28" y1="32" x2="205" y2="208" gradientUnits="userSpaceOnUse"><stop stop-color="#635BFF"/><stop offset="1" stop-color="#18B6A4"/></linearGradient>
+  </defs>
+  <rect x="20" y="20" width="200" height="200" rx="52" fill="url(#brand)"/>
+  <path d="M66 160V134H91V160H66Z" fill="white" fill-opacity=".78"/>
+  <path d="M105 160V111H130V160H105Z" fill="white" fill-opacity=".88"/>
+  <path d="M144 160V88H169V160H144Z" fill="white"/>
+  <path d="M65 112L108 83L140 98L178 59" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 59H178V83" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="265" y="157" fill="#14213D" font-family="Inter,Manrope,Arial,sans-serif" font-size="112" font-weight="750" letter-spacing="-5">Band<tspan fill="#5D61F6">up</tspan></text>
+</svg>
