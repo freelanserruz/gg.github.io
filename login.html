@@ -1,7 +1,5 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вход</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
-<main><h2>Вход</h2><div class="card"><p>Демо-вход для проверки сайта. Вход через Telegram-бота подключим на следующем этапе.</p>
-<input id="nm" placeholder="Ваше имя" maxlength="20"> <button class="btn" id="go">Войти</button> <button class="btn ghost" id="out">Выйти</button><p id="m" class="tag"></p></div></main><script src="app.js"></script><script>
-go.onclick=()=>{const v=nm.value.trim();if(!v)return m.textContent="Введите имя.";save("ep_user",{name:v});location.href="exams.html"};
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body><main><h2 data-i="login"></h2><div class="card"><p data-i="demo"></p>
+<input id="nm" data-p="nm" maxlength="20"> <button class="btn" id="go" data-i="login"></button> <button class="btn ghost" id="out" data-i="out"></button></div></main><script src="app.js"></script><script>
+go.onclick=()=>{const v=nm.value.trim();if(!v)return nm.focus();save("ep_user",{name:v});location.href="exams.html"};
 out.onclick=()=>{try{localStorage.removeItem("ep_user")}catch{}location.reload()};
 </script></body></html>

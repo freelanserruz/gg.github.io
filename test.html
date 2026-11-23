@@ -1,13 +1,11 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Тест</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
-<main><p class="tag" id="n"></p><div class="card" id="c"></div></main><script src="app.js"></script><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body><main><p class="tag" id="n"></p><div class="card" id="c"></div></main><script src="app.js"></script><script>
 const ex=EXAMS[new URLSearchParams(location.search).get("exam")]||EXAMS.dtm;let i=0,score=0,wrong=[];
-function show(){if(i>=ex.q.length)return end();const q=ex.q[i];n.textContent=`${ex.name}: вопрос ${i+1} из ${ex.q.length}`;
-c.innerHTML=`<h3>${q.t}</h3>`+q.o.map((o,j)=>`<button class="opt" data-i="${j}">${o}</button>`).join("")+`<p id="e" aria-live="polite"></p>`}
-c.onclick=e=>{const q=ex.q[i];if(e.target.id==="nx"){i++;return show()}const b=e.target.closest(".opt");if(!b||c.dataset.done==i)return;c.dataset.done=i;const k=+b.dataset.i;
+function show(){if(i>=ex.q.length)return end();const q=ex.q[i];n.textContent=ex.name+": "+t("qof",{a:i+1,b:ex.q.length});
+c.innerHTML="<h3>"+q.t+"</h3>"+q.o.map((o,j)=>'<button class="opt" data-n="'+j+'">'+o+"</button>").join("")+'<p id="e" aria-live="polite"></p>'}
+c.onclick=e=>{const q=ex.q[i];if(e.target.id==="nx"){i++;return show()}const b=e.target.closest(".opt");if(!b||c.dataset.done==i)return;c.dataset.done=i;const k=+b.dataset.n;
 c.querySelectorAll(".opt").forEach((x,j)=>{x.classList.toggle("ok",j===q.a);if(j===k&&k!==q.a)x.classList.add("bad")});
-if(k===q.a)score++;else wrong.push(q);document.getElementById("e").innerHTML=(k===q.a?"Верно. ":"Неверно. ")+q.e+`<br><br><button class="btn" id="nx">${i+1<ex.q.length?"Дальше":"Результат"}</button>`};
-function end(){const pts=score*10,ok=addPoints(pts);n.textContent="";c.innerHTML=`<h3>Результат: ${score} из ${ex.q.length}</h3><p>${ok?`Начислено баллов в рейтинг: ${pts}.`:`Войдите, чтобы баллы попали в рейтинг.`}</p>`+
-(wrong.length?`<h3>Разбор ошибок</h3>`+wrong.map(q=>`<p><b>${q.t}</b><br>Правильно: ${q.o[q.a]}. ${q.e}</p>`).join(""):"<p>Ошибок нет.</p>")+`<a class="btn" href="exams.html">К экзаменам</a>`}
+if(k===q.a)score++;else wrong.push(q);document.getElementById("e").innerHTML=t(k===q.a?"ok":"no")+" "+q.e+'<br><br><button class="btn" id="nx">'+t(i+1<ex.q.length?"next":"res")+"</button>"};
+function end(){const ok=addPoints(score*10);n.textContent="";c.innerHTML="<h3>"+t("res")+": "+score+" / "+ex.q.length+"</h3><p>"+(ok?t("added",{n:score*10}):t("need"))+"</p>"+
+(wrong.length?"<h3>"+t("rev")+"</h3>"+wrong.map(q=>"<p><b>"+q.t+"</b><br>"+t("right")+": "+q.o[q.a]+". "+q.e+"</p>").join(""):"<p>"+t("none")+"</p>")+'<a class="btn" href="exams.html">'+t("toex")+"</a>"}
 show();
 </script></body></html>
