@@ -1,5 +1,5 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=3"></head><body><main><section class="hero"><h1 data-i="h1"></h1><div class="card" id="q"></div><a class="btn" href="start.html" data-i="begin"></a></section></main>
-<script src="app.js?v=3"></script><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=4"></head><body><main><section class="hero"><h1 data-i="h1"></h1><div class="card" id="q"></div><a class="btn" href="start.html" data-i="begin"></a></section></main>
+<script src="i18n2.js?v=4"></script><script src="app.js?v=4"></script><script>
 const q=BANK.english.q[2],box=document.getElementById("q");
 box.innerHTML="<h3>"+q.t+"</h3>"+q.o.map((o,i)=>'<button class="opt" data-n="'+i+'">'+o+"</button>").join("")+'<p id="r" class="tag" aria-live="polite"></p>';
 box.onclick=e=>{const b=e.target.closest(".opt");if(!b)return;const i=+b.dataset.n;box.querySelectorAll(".opt").forEach((x,j)=>{x.classList.toggle("ok",j===q.a);if(j===i&&i!==q.a)x.classList.add("bad")});r.textContent=t(i===q.a?"ok":"no")+" "+q.e};

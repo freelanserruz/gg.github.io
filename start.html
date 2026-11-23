@@ -1,15 +1,35 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=3"></head><body><main><div id="w"></div></main><script src="app.js?v=3"></script><script>if(typeof BANK==="undefined"){document.body.insertAdjacentHTML("beforeend","<main><div class=card>app.js is outdated. Upload the new app.js and style.css, then press Ctrl+F5.</div></main>");throw 0}
-
-let bank="";const S={};
-function opts(keys,fn){return '<div class="row">'+keys.map(k=>'<button class="card" data-k="'+k+'">'+t(k)+"</button>").join("")+"</div>"}
-let cur=1;function step1(){cur=1;w.innerHTML='<h2>'+t("s1")+'</h2><p class="tag">'+t("s1p")+'</p><button class="pick pv" data-b="english"><h3>'+t("eng")+'</h3><p>'+t("engd")+'</p></button><button class="pick pb" data-b="ielts"><h3>'+t("ielts")+'</h3><p>'+t("ieltsd")+'</p></button>'}
-function step2(){cur=2;w.innerHTML='<h2>'+t("s2")+'</h2>'+opts(["g1","g2","g3","g4","g5"])+'<p><button class="btn ghost" id="bk">'+t("back")+'</button></p>'}
-function step3(){cur=3;w.innerHTML='<h2>'+t("s3")+'</h2><div class="row"><button class="card" data-f="academic">Academic</button><button class="card" data-f="general">General Training</button></div><p><button class="btn ghost" id="bk">'+t("back")+'</button></p>'}
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=4"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=4"></script><script src="app.js?v=4"></script><script>
+const FL={english:["lang","why","level","before","hard","time","days","style","remind","source"],ielts:["lang","goal","format","branch","target","now","date","tries","hard","time","days","style","remind","source"]};
+const T=(ks,p="q_")=>ks.map(k=>[k,t(p+k)]);
+let bank="",i=0,ans={};
+const D={lang:()=>({p:t("q_plang"),o:Object.entries(LANGS)}),
+why:()=>({p:t("q_pwhy"),o:T(["w1","w2","w3","w4","w5"])}),
+level:()=>({p:t("q_plevel"),o:T(["lv1","lv2","lv3","lv4"])}),
+before:()=>({p:t("q_pbefore"),o:T(["b1","b2","b3","b4","b5"])}),
+goal:()=>({p:t("s2"),o:T(["g1","g2","g3","g4","g5"],"")}),
+format:()=>({p:t("s3"),o:[["academic","Academic"],["general","General Training"]]}),
+branch:()=>ans.format==="general"?{p:t("q_pgc"),o:T(["c1","c2","c3","c4"])}:{p:t("q_pba"),o:T(["ba1","ba2","ba3","ba4"])},
+target:()=>({p:t("q_ptarget"),o:[["5.5","5.5"],["6.0","6.0"],["6.5","6.5"],["7.0","7.0"],["7.5","7.5+"],["dk",t("q_dk")]]}),
+now:()=>({p:t("q_pnow"),o:[["nw0",t("q_nw0")],["5","≤ 5.0"],["5.5","5.5–6.0"],["6.5","6.5–7.0"],["7.5","7.5+"]]}),
+date:()=>({p:t("q_pdate"),o:[["d1",t("q_d1")],["d2",t("q_d2")],["d3",t("q_d3")],["dk",t("q_dk")]]}),
+tries:()=>({p:t("q_ptries"),o:T(["t1","t2","t3"])}),
+hard:()=>({p:t("q_phard"),o:T(["hd1","hd2","hd3","hd4"].concat(bank==="english"?["hd5","hd6"]:[]))}),
+time:()=>({p:t("q_ptime"),o:(bank==="english"?[5,10,15,30]:[15,30,60,90]).map(n=>[n,t("q_umin",{n})])}),
+days:()=>({p:t("q_pdays"),o:[3,5,7].map(n=>[n,t("q_udays",{n})])}),
+style:()=>({p:t("q_pstyle"),o:T(["st1","st2","st3","st4"])}),
+remind:()=>({p:t("q_premind"),o:T(["yes","no"])}),
+source:()=>({p:t("q_psource"),o:[["TikTok","TikTok"],["Instagram","Instagram"],["Telegram","Telegram"],...T(["so4","so5"])]})};
+const persist=()=>save("ep_flow",{bank,i,ans});
+function course(){pb.style.transform="scaleX(0)";w.innerHTML="<h2>"+t("s1")+'</h2><p class="tag">'+t("s1p")+'</p><button class="pick pv" data-b="english"><h3>'+t("eng")+"</h3><p>"+t("engd")+'</p></button><button class="pick pb" data-b="ielts"><h3>'+t("ielts")+"</h3><p>"+t("ieltsd")+"</p></button>"}
+function render(){const f=FL[bank];if(i>=f.length)return done();const d=D[f[i]]();pb.style.transform="scaleX("+(i/f.length)+")";
+w.innerHTML='<p class="tag">'+t("qof",{a:i+1,b:f.length})+"</p><h2>"+d.p+"</h2>"+d.o.map(([v,l])=>'<button class="opt" data-v="'+v+'">'+l+"</button>").join("")+'<p><button class="btn ghost" id="bk">'+t("back")+"</button></p>"}
+function done(){pb.style.transform="scaleX(1)";save("ep_plan",{bank,ans});const ch=FL[bank].filter(k=>k!=="lang").map(k=>{const o=D[k]().o.find(x=>String(x[0])===String(ans[k]));return '<span class="chip">'+(o?o[1]:ans[k])+"</span>"}).join("");
+w.innerHTML="<h2>"+t("q_done")+"</h2><p>"+t("q_donep")+"</p><p>"+ch+'</p><p><a class="btn" href="test.html?bank='+bank+'">'+t("q_check")+'</a> <a class="btn ghost" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+"</a></p>"}
 w.onclick=e=>{const b=e.target.closest("button");if(!b)return;
-if(b.id==="bk")return cur===3?step2():step1();
-if(b.dataset.b){bank=b.dataset.b;return bank==="ielts"?step2():go()}
-if(b.dataset.k){S.goal=b.dataset.k;return step3()}
-if(b.dataset.f){S.fmt=b.dataset.f;go()}};
-function go(){save("ep_plan",{bank,...S});location.href="test.html?bank="+bank}
-step1();
+if(b.dataset.b){bank=b.dataset.b;i=0;ans={};return render()}
+if(b.id==="bk"){if(i===0){bank="";return course()}i--;return render()}
+if(b.dataset.v!==undefined){const k=FL[bank][i];ans[k]=b.dataset.v;i++;persist();
+if(k==="lang"&&b.dataset.v!==lang){save("ep_lang",b.dataset.v);save("ep_resume",1);return location.reload()}render()}};
+if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}const f=ls("ep_flow",null);if(f&&FL[f.bank]){bank=f.bank;i=f.i;ans=f.ans}}
+bank?render():course();
 </script></body></html>

@@ -57,6 +57,7 @@ Object.assign(L.uz,{games:"O‘yinlar",guides:"Qo‘llanmalar",startb:"Boshlash"
 Object.assign(L.ar,{games:"ألعاب",guides:"أدلة",startb:"ابدأ",p:"تدريب على الإنجليزية وIELTS: اختبارات وألعاب وشرح لكل خطأ."});
 Object.assign(L.tr,{games:"Oyunlar",guides:"Rehberler",startb:"Başla",p:"İngilizce ve IELTS: testler, oyunlar ve her hatanın açıklaması."});
 Object.assign(L.kk,{games:"Ойындар",guides:"Нұсқаулықтар",startb:"Бастау",p:"Ағылшын және IELTS: тесттер, ойындар және әр қатенің талдауы."});
+if(window.Z2){const{K,Z,K0,Z0}=Z2;for(const l in Z){K.forEach((k,i)=>L[l][k]=Z[l].split("|")[i])}for(const l in Z0){K0.forEach((k,i)=>L[l][k]=Z0[l].split("|")[i])}}
 Object.keys(L).forEach(k=>L[k].brand="Tayyor");
 const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
