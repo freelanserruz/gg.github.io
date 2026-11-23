@@ -1,9 +1,9 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=7"></script><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=6"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=8"></script><script src="lesson-content.js?v=1"></script><script>
 const FRESH=()=>({bank:"",i:0,ans:{},prog:0,phase:"survey",d:{i:0,s:0,w:[],o:[]}});
 let S=FRESH(),pool=[],pick=[];
 const T=(ks,p="q_")=>ks.map(k=>[k,t(p+k)]);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const persist=()=>save("ep_flow",S),bar=x=>pb.style.transform="scaleX("+x+")";
+const persist=()=>save(S.bank==="english"?"ep_flow_en":"ep_flow_ielts",S),bar=x=>pb.style.transform="scaleX("+x+")";
 const stg=n=>'<p class="tag">'+["q_s1","q_s2","q_s3"].map((k,j)=>j===n?"<b>"+t(k)+"</b>":t(k)).join(" · ")+"</p>";
 const D={lang:()=>({p:t("q_plang"),o:Object.entries(LANGS)}),
 why:()=>({p:t("q_pwhy"),o:T(["w1","w2","w3","w4","w5"])}),
@@ -48,19 +48,28 @@ document.getElementById("fb").innerHTML=(ok?t("ok"):t("no")+" "+(ct?esc(ct)+". "
 function result(){const d=S.d,s=d.s,lv=s<=3?"A1":s<=7?"A1–A2":s<=11?"A2":s<=13?"A2–B1":"B1";const hs=[...new Set(d.w)].map(k=>"<li>"+t("q_hn_"+k)+"</li>").join("");
 plan("<h2>"+t("q_rt",{l:lv})+"</h2><p>"+t("q_sc",{n:s})+'</p><p class="tag">'+t("q_rn")+"</p>"+(hs?"<h3>"+t("q_rev")+"</h3><ul>"+hs+"</ul>":"<p>"+t("q_perf")+"</p>")+"<hr>")}
 w.onclick=e=>{const b=e.target.closest("button");if(!b)return;const D0=b.dataset;
-if(D0.b){S=FRESH();S.bank=D0.b;return survey()}
+if(D0.b){S=FRESH();S.bank=D0.b;save("ep_active_course",D0.b);persist();return survey()}
 if(b.id==="bk"){if(S.i===0){S.bank="";return course()}S.i--;return survey()}
 if(D0.v!==undefined){const k=FLW()[S.i];S.ans[k]=D0.v;S.i++;persist();if(k==="lang"&&D0.v!==lang){save("ep_lang",D0.v);save("ep_resume",1);return location.reload()}return survey()}
 if(D0.a==="ds"){S.d={i:0,s:0,w:[],o:[]};persist();return diag()}
-if(D0.a==="lesson"){S.phase="lesson";S.lessonNo=S.lessonNo||1;persist();return lesson()}
-if(D0.a==="nextLesson"){S.lessonNo=(S.lessonNo||1)+1;if(S.lessonNo>10)S.lessonNo=1;persist();return lesson()}
+if(D0.a==="lesson"){S.phase="lesson";S.lessonNo=S.lessonNo||1;S.lessonStep=S.lessonStep||0;persist();return lesson()}
+if(D0.a==="lessonAnswer"){if(S.lessonAnswered===undefined){S.lessonAnswered=+D0.answer;persist()}return lesson()}
+if(D0.a==="nextCard"){if((S.lessonStep||0)>=9){S.phase=(S.lessonNo||1)>=10?"courseDone":"break";S.nextLesson=(S.lessonNo||1)+1}else{S.lessonStep=(S.lessonStep||0)+1;delete S.lessonAnswered}persist();return S.phase==="lesson"?lesson():S.phase==="break"?lessonBreak():courseDone()}
+if(D0.a==="continueNext"){S.lessonNo=S.nextLesson||2;S.lessonStep=0;delete S.lessonAnswered;S.phase="lesson";persist();return lesson()}
 if(D0.j!==undefined){const q=DQ()[S.d.i],j=+D0.j;w.querySelectorAll(".opt").forEach((x,n)=>{x.disabled=true;x.classList.toggle("ok",n===q.a);if(n===j&&j!==q.a)x.classList.add("bad")});return fin(j===q.a,q,"")}
 if(D0.p!==undefined){pick.push(pool.splice(+D0.p,1)[0]);return drawChips()}
 if(D0.r!==undefined){pool.push(pick.splice(+D0.r,1)[0]);return drawChips()}
 if(b.id==="ck"){const q=DQ()[S.d.i];b.disabled=true;w.querySelectorAll(".chip").forEach(x=>x.disabled=true);return fin(pick.join(" ")===q.ans,q,q.ans)}
 if(b.id==="nx"){S.d.i++;persist();return diag()}};
-function lesson(){bar(1);const lessons=[t("lesson1"),t("lesson2"),t("lesson3"),t("lesson4"),t("lesson5"),t("lesson6"),t("lesson7"),t("lesson8"),t("lesson9"),t("lesson10")];const n=Math.min(Math.max(S.lessonNo||1,1),10);w.innerHTML=stg(2)+"<h2>"+t("lessonTitle",{n})+"</h2><p>"+lessons[n-1]+"</p><p class=\"tag\">"+t("lessonCount",{n})+"</p><button class=\"btn\" data-a=\"nextLesson\">"+t("next")+"</button>"}
-function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.phase==="lesson")return lesson();if(S.bank==="english"&&S.d.o.length)return result();plan()}
-const f=ls("ep_flow",null);if(f&&f.bank==="english"){S=Object.assign(FRESH(),f);try{localStorage.removeItem("ep_resume")}catch{}}else if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}if(f&&f.bank)S=Object.assign(FRESH(),f)}
+function lesson(){const n=Math.min(Math.max(S.lessonNo||1,1),10),step=S.lessonStep||0,unit=window.ENGLISH_LESSONS[n-1],isTask=step>=5,ix=isTask?step-5:step;bar((step+1)/10);let body="";
+if(!isTask)body='<article class="card"><h3>'+t("exampleLabel",{n:ix+1})+'</h3><p>'+unit.examples[ix]+'</p></article>';
+else{const q=unit.tasks[ix],answered=S.lessonAnswered!==undefined,chosen=S.lessonAnswered;body='<article class="card"><h3>'+t("taskLabel",{n:ix+1})+'</h3><p>'+q.q+'</p>'+q.o.map((o,j)=>'<button class="opt'+(answered&&j===q.a?' ok':answered&&j===chosen?' bad':'')+'" data-a="lessonAnswer" data-answer="'+j+'" '+(answered?'disabled':'')+'>'+o+'</button>').join("")+(answered?'<p aria-live="polite">'+(chosen===q.a?t("ok"):t("no"))+" "+q.e+"</p>":"")+"</article>"}
+const canAdvance=!isTask||S.lessonAnswered!==undefined;w.innerHTML='<p class="tag">'+t("lessonTitle",{n})+'</p><h2>'+unit.title+'</h2>'+body+(canAdvance?'<button class="btn" data-a="nextCard">'+t("next")+"</button>":"")}
+function lessonBreak(){bar(1);w.innerHTML='<section class="card"><h2>'+t("lessonFinished")+'</h2><p>'+t("lessonRest")+'</p><p>'+t("nextLessonReady",{n:S.nextLesson||2})+'</p><button class="btn" data-a="continueNext">'+t("continueLessons",{n:S.nextLesson||2})+'</button></section>'}
+function courseDone(){bar(1);w.innerHTML='<section class="card"><h2>'+t("courseFinished")+'</h2><p>'+t("courseFinishedText")+'</p><a class="btn" href="index.html">'+t("home")+'</a></section>'}
+function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.phase==="lesson")return lesson();if(S.bank==="english"&&S.phase==="break")return lessonBreak();if(S.bank==="english"&&S.phase==="courseDone")return courseDone();if(S.bank==="english"&&S.d.o.length)return result();plan()}
+const legacy=ls("ep_flow",null);if(legacy&&legacy.bank==="english"&&!ls("ep_flow_en",null))save("ep_flow_en",legacy);if(legacy&&legacy.bank==="ielts"&&!ls("ep_flow_ielts",null))save("ep_flow_ielts",legacy);
+const resume=ls("ep_resume",0);const requestedCourse=new URLSearchParams(location.search).get("course")||(resume?ls("ep_active_course",""):"");if(resume)try{localStorage.removeItem("ep_resume")}catch{}const saved=ls(requestedCourse==="ielts"?"ep_flow_ielts":"ep_flow_en",null);
+if(saved&&saved.bank===(requestedCourse==="ielts"?"ielts":"english")){S=Object.assign(FRESH(),saved);save("ep_active_course",S.bank)}else if(requestedCourse==="ielts"){S.bank="ielts";save("ep_active_course","ielts")}
 route();
 </script></body></html>
