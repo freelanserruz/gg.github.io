@@ -1,23 +1,17 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=6"></head><body><main><h2 id="title"></h2><div class="card" id="content"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=8"></script><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=7"></head><body><main><h2 id="title"></h2><div class="card" id="content" aria-live="polite"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=9"></script><script>
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const u=me(),title=document.getElementById("title"),content=document.getElementById("content");title.textContent=t("profile");
-if(!u){content.innerHTML="<p>"+t("loginFirst")+'</p><a class="btn" href="login.html">'+t("login")+"</a>"}
-else{
-const english=ls("ep_flow_en",null),ielts=ls("ep_flow_ielts",ls("ep_flow",null)),bank=ls("ep_active_course","");
-const active=(bank==="ielts"&&ielts&&ielts.bank==="ielts")?ielts:(english&&english.bank==="english"?english:(ielts&&ielts.bank==="ielts"?ielts:null));
-const score=users()[u.name]||0;let course=t("profileNoCourse"),status=t("profileNone"),details="",href="start.html",action=t("startb");
+(async()=>{const title=document.getElementById("title"),content=document.getElementById("content");title.textContent=t("profile");const user=await BANDUP_SESSION_READY;if(!user){content.textContent=t("loginFirst");return}
+content.textContent=t("adminLoading");let remote=null,lessons={};try{const result=await api("/api/progress?course=english");remote=result.progress;lessons=(await api("/api/lessons")).lessons||{}}catch{}
+const english=remote||ls("ep_flow_en",null),ielts=ls("ep_flow_ielts",ls("ep_flow",null)),bank=ls("ep_active_course","");const active=(bank==="ielts"&&ielts&&ielts.bank==="ielts")?ielts:(english&&english.bank==="english"?english:(ielts&&ielts.bank==="ielts"?ielts:null));
+let course=t("profileNoCourse"),status=t("profileNone"),details="",href="start.html",action=t("startb");
 if(active&&active.bank==="english"){
-course=t("profileEnglish");action=active.phase==="lesson"||active.phase==="break"||active.phase==="plan"?t("continueb"):t("startb");
-href="start.html";
-if(active.phase==="lesson"){
-const n=Math.min(10,Math.max(1,Number(active.lessonNo)||1)),step=Math.min(9,Math.max(0,Number(active.lessonStep)||0)),progress=(n-1)+(step+1)/10;
-status=t("profileLessonNow",{n});details='<p>'+t("profileLessonsDone",{n:n-1})+'</p><p>'+t("profileLessonsLeft",{n:10-n})+'</p><progress max="10" value="'+progress+'" aria-label="'+t("profileProgressLabel")+'"></progress>';
-}else if(active.phase==="break"){status=t("profileBreak");details='<p>'+t("nextLessonReady",{n:active.nextLesson||2})+'</p>'}
-else if(active.phase==="plan"&&active.d&&active.d.o&&active.d.o.length){status=t("profileBeforeLesson");details='<p>'+t("profileLessonsLeft",{n:10})+'</p>'}
-else status=t("profileDiag");
-}else if(active&&active.bank==="ielts"){
-course=t("profileIELTS")+(active.ans&&active.ans.format?" · "+(active.ans.format==="academic"?"Academic":"General Training"):"");status=active.phase==="plan"?t("profilePlan"):t("profileSurvey");href="start.html?course=ielts";action=t("startb");
-}
-content.innerHTML='<p class="tag">'+t("name")+'</p><h3>'+esc(u.name)+'</h3><hr><p class="tag">'+t("profileCourse")+'</p><h3>'+esc(course)+'</h3><p class="tag">'+t("profileStatus")+'</p><p>'+esc(status)+'</p>'+details+'<p class="tag">'+t("profilePoints")+'</p><h3>'+score+'</h3><p><a class="btn" href="'+href+'">'+esc(action)+'</a> <a class="btn ghost" href="rating.html">'+t("profileLeaderboard")+'</a></p>';
-}
+ course=t("profileEnglish");action=active.phase==="lesson"||active.phase==="break"||active.phase==="plan"?t("continueb"):t("startb");
+ if(active.phase==="lesson"){const n=Math.min(10,Math.max(1,Number(active.lessonNo)||1)),step=Math.min(9,Math.max(0,Number(active.lessonStep)||0)),progress=(n-1)+(step+1)/10;status=t("profileLessonNow",{n});details='<p>'+t("profileLessonsDone",{n:n-1})+'</p><p>'+t("profileLessonsLeft",{n:10-n})+'</p><progress max="10" value="'+progress+'" aria-label="'+t("profileProgressLabel")+'"></progress>';href="start.html"}
+ else if(active.phase==="break"){const n=Number(active.nextLesson)||2;status=t("profileBreak");details='<p>'+t("nextLessonReady",{n})+'</p>';href="start.html?lesson="+n}
+ else if(active.phase==="courseDone"){status=t("courseFinished");href="games.html";action=t("games")}
+ else if(active.phase==="plan"&&active.d&&active.d.o&&active.d.o.length){status=t("profileBeforeLesson");details='<p>'+t("profileLessonsLeft",{n:10})+'</p>'}else status=t("profileDiag");
+}else if(active&&active.bank==="ielts"){course=t("profileIELTS")+(active.ans&&active.ans.format?" · "+(active.ans.format==="academic"?"Academic":"General Training"):"");status=active.phase==="plan"?t("profilePlan"):t("profileSurvey");href="start.html?course=ielts";action=t("startb")}
+const done=Object.values(lessons).filter(x=>x.perfect).length;details+='<p>'+t("profileLessonsDone",{n:done})+'</p>';
+content.innerHTML='<p class="tag">'+t("name")+'</p><h3>'+esc(user.name)+'</h3><hr><p class="tag">'+t("profileCourse")+'</p><h3>'+esc(course)+'</h3><p class="tag">'+t("profileStatus")+'</p><p>'+esc(status)+'</p>'+details+'<p class="tag">'+t("profilePoints")+'</p><h3>'+Number(user.points||0)+'</h3><p><a class="btn" href="'+esc(href)+'">'+esc(action)+'</a> <a class="btn ghost" href="rating.html">'+t("profileLeaderboard")+'</a></p>';
+})();
 </script></body></html>

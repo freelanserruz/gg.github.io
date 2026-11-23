@@ -1,12 +1,12 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=6"></head><body><main><p class="tag" id="n"></p><div class="card" id="c"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=8"></script><script>if(typeof BANK==="undefined"){document.body.insertAdjacentHTML("beforeend","<main><div class=card>app.js is outdated. Upload the new app.js and style.css, then press Ctrl+F5.</div></main>");throw 0}
 
-const P=new URLSearchParams(location.search);const ex=BANK[P.get("bank")]||EXAMS[P.get("exam")]||EXAMS.dtm;let i=0,score=0,wrong=[];
+const P=new URLSearchParams(location.search);const scoreKey=P.get("bank")||P.get("exam")||"dtm";const ex=BANK[P.get("bank")]||EXAMS[P.get("exam")]||EXAMS.dtm;let i=0,score=0,wrong=[],answers=[];
 function show(){if(i>=ex.q.length)return end();const q=ex.q[i];n.textContent=ex.name+": "+t("qof",{a:i+1,b:ex.q.length});
 c.innerHTML="<h3>"+q.t+"</h3>"+q.o.map((o,j)=>'<button class="opt" data-n="'+j+'">'+o+"</button>").join("")+'<p id="e" aria-live="polite"></p>'}
-c.onclick=e=>{const q=ex.q[i];if(e.target.id==="nx"){i++;return show()}const b=e.target.closest(".opt");if(!b||c.dataset.done==i)return;c.dataset.done=i;const k=+b.dataset.n;
+c.onclick=async e=>{const q=ex.q[i];if(e.target.id==="nx"){i++;return show()}const b=e.target.closest(".opt");if(!b||c.dataset.done==i)return;c.dataset.done=i;const k=+b.dataset.n;
 c.querySelectorAll(".opt").forEach((x,j)=>{x.classList.toggle("ok",j===q.a);if(j===k&&k!==q.a)x.classList.add("bad")});
-if(k===q.a)score++;else wrong.push(q);document.getElementById("e").innerHTML=t(k===q.a?"ok":"no")+" "+q.e+'<br><br><button class="btn" id="nx">'+t(i+1<ex.q.length?"next":"res")+"</button>"};
-function end(){const ok=addPoints(score*10);n.textContent="";c.innerHTML="<h3>"+t("res")+": "+score+" / "+ex.q.length+"</h3><p>"+(ok?t("added",{n:score*10}):t("need"))+"</p>"+
+answers[i]=k;if(k===q.a)score++;else wrong.push(q);document.getElementById("e").innerHTML=t(k===q.a?"ok":"no")+" "+q.e+'<br><br><button class="btn" id="nx">'+t(i+1<ex.q.length?"next":"res")+"</button>"};
+async function end(){const ok=await api("/api/scores",{method:"POST",body:JSON.stringify({kind:"test",key:scoreKey,answers})}).then(r=>{const u=me();if(u)save("ep_user",{...u,points:r.points});return true}).catch(()=>false);n.textContent="";c.innerHTML="<h3>"+t("res")+": "+score+" / "+ex.q.length+"</h3><p>"+(ok?t("added",{n:score*10}):t("saveError"))+"</p>"+
 (wrong.length?"<h3>"+t("rev")+"</h3>"+wrong.map(q=>"<p><b>"+q.t+"</b><br>"+t("right")+": "+q.o[q.a]+". "+q.e+"</p>").join(""):"<p>"+t("none")+"</p>")+'<a class="btn" href="start.html">'+t("begin")+"</a>"}
 show();
 </script></body></html>

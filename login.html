@@ -1,5 +1,34 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=6"></head><body><main><h2 data-i="login"></h2><div class="card"><p data-i="demo"></p>
-<input id="nm" data-p="nm" maxlength="20"> <button class="btn" id="go" data-i="login"></button> <button class="btn ghost" id="out" data-i="out"></button></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=8"></script><script>
-go.onclick=()=>{const v=nm.value.trim();if(!v)return nm.focus();save("ep_user",{name:v});location.href="exams.html"};
-out.onclick=()=>{try{localStorage.removeItem("ep_user")}catch{}location.reload()};
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Вход · Bandup</title>
+  <link rel="icon" type="image/svg+xml" href="bandup-icon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body><main><h1>Bandup</h1><section class="card auth-card">
+  <h2 id="title"></h2>
+  <div class="row auth-tabs"><button class="btn" id="login-tab" type="button"></button><button class="btn ghost" id="register-tab" type="button"></button></div>
+  <form id="auth-form">
+    <label for="nm" id="name-label"></label><input id="nm" name="name" minlength="2" maxlength="20" autocomplete="username" required>
+    <label for="pw" id="password-label"></label><input id="pw" name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required>
+    <details id="admin-details" hidden><summary id="admin-summary"></summary><label for="admin-key" data-i="adminSetupKey"></label><input id="admin-key" name="adminKey" type="password" autocomplete="off"></details>
+    <p class="tag" id="hint"></p><p class="auth-error" id="error" role="alert" aria-live="polite"></p>
+    <button class="btn" id="submit" type="submit"></button>
+  </form>
+  <p id="signed-in" hidden></p><button class="btn ghost" id="logout" type="button" hidden></button>
+</section></main>
+<script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=9"></script>
+<script>
+const form=document.getElementById("auth-form"),title=document.getElementById("title"),nameInput=document.getElementById("nm"),passwordInput=document.getElementById("pw"),error=document.getElementById("error");
+let mode="login";
+function showMode(next){mode=next;const registering=mode==="register";title.textContent=t(registering?"registerTab":"loginTab");document.getElementById("login-tab").className="btn "+(registering?"ghost":"");document.getElementById("register-tab").className="btn "+(registering?"":"ghost");document.getElementById("name-label").textContent=t("username");document.getElementById("password-label").textContent=t("password");document.getElementById("hint").textContent=registering?t("passwordHint"):"";document.getElementById("submit").textContent=t(registering?"registerTab":"loginTab");document.getElementById("admin-details").hidden=!registering;passwordInput.autocomplete=registering?"new-password":"current-password";error.textContent=""}
+document.getElementById("login-tab").textContent=t("loginTab");document.getElementById("register-tab").textContent=t("registerTab");document.getElementById("admin-summary").textContent=t("adminSetupKey");document.getElementById("logout").textContent=t("logout");
+document.getElementById("login-tab").onclick=()=>showMode("login");document.getElementById("register-tab").onclick=()=>showMode("register");
+function finishLogin(user){save("ep_user",user);const requested=new URLSearchParams(location.search).get("next")||"/index.html";let next="/index.html";try{const target=new URL(requested,location.origin);if(target.origin===location.origin)next=target.pathname+target.search+target.hash}catch{}location.replace(next)}
+form.onsubmit=async(event)=>{event.preventDefault();const button=document.getElementById("submit");button.disabled=true;error.textContent="";try{const body={name:nameInput.value,password:passwordInput.value};if(mode==="register")body.adminKey=document.getElementById("admin-key").value;const result=await api(mode==="register"?"/api/auth/register":"/api/auth/login",{method:"POST",body:JSON.stringify(body)});finishLogin(result.user)}catch(e){error.textContent=e.message||t("authError")}finally{button.disabled=false}};
+document.getElementById("logout").onclick=async()=>{try{await api("/api/auth/logout",{method:"POST",body:"{}"})}catch{}try{localStorage.removeItem("ep_user")}catch{}location.replace("login.html")};
+showMode("login");
+BANDUP_SESSION_READY.then(user=>{if(user){form.hidden=true;title.textContent=t("profile");const signed=document.getElementById("signed-in");signed.hidden=false;signed.textContent=user.name;document.getElementById("logout").hidden=false}else form.hidden=false});
 </script></body></html>

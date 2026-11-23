@@ -3,7 +3,7 @@ const FRESH=()=>({bank:"",i:0,ans:{},prog:0,phase:"survey",d:{i:0,s:0,w:[],o:[]}
 let S=FRESH(),pool=[],pick=[];
 const T=(ks,p="q_")=>ks.map(k=>[k,t(p+k)]);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const persist=()=>save(S.bank==="english"?"ep_flow_en":"ep_flow_ielts",S),bar=x=>pb.style.transform="scaleX("+x+")";
+const persist=()=>{save(S.bank==="english"?"ep_flow_en":"ep_flow_ielts",S);if(S.bank&&me())api("/api/progress",{method:"PUT",body:JSON.stringify({course:S.bank,progress:S})}).catch(()=>{})},bar=x=>pb.style.transform="scaleX("+x+")";
 const stg=n=>'<p class="tag">'+["q_s1","q_s2","q_s3"].map((k,j)=>j===n?"<b>"+t(k)+"</b>":t(k)).join(" · ")+"</p>";
 const D={lang:()=>({p:t("q_plang"),o:Object.entries(LANGS)}),
 why:()=>({p:t("q_pwhy"),o:T(["w1","w2","w3","w4","w5"])}),
@@ -47,15 +47,16 @@ function fin(ok,q,ct){const d=S.d;let h="";if(ok)d.s++;else{h=(d.w.includes(q.k)
 document.getElementById("fb").innerHTML=(ok?t("ok"):t("no")+" "+(ct?esc(ct)+". ":"")+h)+'<br><br><button class="btn" id="nx">'+t(d.i+1<DQ().length?"next":"res")+"</button>"}
 function result(){const d=S.d,s=d.s,lv=s<=3?"A1":s<=7?"A1–A2":s<=11?"A2":s<=13?"A2–B1":"B1";const hs=[...new Set(d.w)].map(k=>"<li>"+t("q_hn_"+k)+"</li>").join("");
 plan("<h2>"+t("q_rt",{l:lv})+"</h2><p>"+t("q_sc",{n:s})+'</p><p class="tag">'+t("q_rn")+"</p>"+(hs?"<h3>"+t("q_rev")+"</h3><ul>"+hs+"</ul>":"<p>"+t("q_perf")+"</p>")+"<hr>")}
-w.onclick=e=>{const b=e.target.closest("button");if(!b)return;const D0=b.dataset;
+w.onclick=async e=>{const b=e.target.closest("button");if(!b)return;const D0=b.dataset;
 if(D0.b){S=FRESH();S.bank=D0.b;save("ep_active_course",D0.b);persist();return survey()}
 if(b.id==="bk"){if(S.i===0){S.bank="";return course()}S.i--;return survey()}
 if(D0.v!==undefined){const k=FLW()[S.i];S.ans[k]=D0.v;S.i++;persist();if(k==="lang"&&D0.v!==lang){save("ep_lang",D0.v);save("ep_resume",1);return location.reload()}return survey()}
 if(D0.a==="ds"){S.d={i:0,s:0,w:[],o:[]};persist();return diag()}
-if(D0.a==="lesson"){S.phase="lesson";S.lessonNo=S.lessonNo||1;S.lessonStep=S.lessonStep||0;persist();return lesson()}
-if(D0.a==="lessonAnswer"){if(S.lessonAnswered===undefined){S.lessonAnswered=+D0.answer;persist()}return lesson()}
-if(D0.a==="nextCard"){if((S.lessonStep||0)>=9){S.phase=(S.lessonNo||1)>=10?"courseDone":"break";S.nextLesson=(S.lessonNo||1)+1}else{S.lessonStep=(S.lessonStep||0)+1;delete S.lessonAnswered}persist();return S.phase==="lesson"?lesson():S.phase==="break"?lessonBreak():courseDone()}
-if(D0.a==="continueNext"){S.lessonNo=S.nextLesson||2;S.lessonStep=0;delete S.lessonAnswered;S.phase="lesson";persist();return lesson()}
+if(D0.a==="lesson"){S.phase="lesson";S.lessonNo=S.lessonNo||1;S.lessonStep=S.lessonStep||0;S.lessonAnswers=S.lessonAnswers||[];persist();return lesson()}
+if(D0.a==="lessonAnswer"){if(S.lessonAnswered===undefined){S.lessonAnswered=+D0.answer;S.lessonAnswers=S.lessonAnswers||[];S.lessonAnswers[S.lessonStep-5]=S.lessonAnswered;persist()}return lesson()}
+if(D0.a==="nextCard"){b.disabled=true;if((S.lessonStep||0)>=9){try{const result=await api("/api/lessons/complete",{method:"POST",body:JSON.stringify({lesson:S.lessonNo||1,answers:S.lessonAnswers||[]})});S.lessonPoints=result.points;S.lessonPerfect=result.perfect;const current=me();if(current)save("ep_user",{...current,points:result.totalPoints});S.phase=(S.lessonNo||1)>=10?"courseDone":"break";S.nextLesson=(S.lessonNo||1)+1}catch(err){b.disabled=false;document.getElementById("w").insertAdjacentHTML("beforeend",'<p class="auth-error" role="alert">'+t("saveError")+'</p>');return}}else{S.lessonStep=(S.lessonStep||0)+1;delete S.lessonAnswered}persist();return S.phase==="lesson"?lesson():S.phase==="break"?lessonBreak():courseDone()}
+if(D0.a==="retryLesson"){try{const list=await api("/api/lessons");if(list.lessons[S.lessonNo]?.perfect){S.lessonPerfect=true;persist();return lessonBreak()}S.lessonStep=0;S.lessonAnswers=[];delete S.lessonAnswered;S.lessonPerfect=false;S.phase="lesson";persist();return lesson()}catch{return}}
+if(D0.a==="continueNext"){S.lessonNo=S.nextLesson||2;S.lessonStep=0;S.lessonAnswers=[];delete S.lessonAnswered;S.lessonPoints=0;S.lessonPerfect=false;S.phase="lesson";persist();return lesson()}
 if(D0.j!==undefined){const q=DQ()[S.d.i],j=+D0.j;w.querySelectorAll(".opt").forEach((x,n)=>{x.disabled=true;x.classList.toggle("ok",n===q.a);if(n===j&&j!==q.a)x.classList.add("bad")});return fin(j===q.a,q,"")}
 if(D0.p!==undefined){pick.push(pool.splice(+D0.p,1)[0]);return drawChips()}
 if(D0.r!==undefined){pool.push(pick.splice(+D0.r,1)[0]);return drawChips()}
@@ -65,11 +66,12 @@ function lesson(){const n=Math.min(Math.max(S.lessonNo||1,1),10),step=S.lessonSt
 if(!isTask)body='<article class="card"><h3>'+t("exampleLabel",{n:ix+1})+'</h3><p>'+unit.examples[ix]+'</p></article>';
 else{const q=unit.tasks[ix],answered=S.lessonAnswered!==undefined,chosen=S.lessonAnswered;body='<article class="card"><h3>'+t("taskLabel",{n:ix+1})+'</h3><p>'+q.q+'</p>'+q.o.map((o,j)=>'<button class="opt'+(answered&&j===q.a?' ok':answered&&j===chosen?' bad':'')+'" data-a="lessonAnswer" data-answer="'+j+'" '+(answered?'disabled':'')+'>'+o+'</button>').join("")+(answered?'<p aria-live="polite">'+(chosen===q.a?t("ok"):t("no"))+" "+q.e+"</p>":"")+"</article>"}
 const canAdvance=!isTask||S.lessonAnswered!==undefined;w.innerHTML='<p class="tag">'+t("lessonTitle",{n})+'</p><h2>'+unit.title+'</h2>'+body+(canAdvance?'<button class="btn" data-a="nextCard">'+t("next")+"</button>":"")}
-function lessonBreak(){bar(1);w.innerHTML='<section class="card"><h2>'+t("lessonFinished")+'</h2><p>'+t("lessonRest")+'</p><p>'+t("nextLessonReady",{n:S.nextLesson||2})+'</p><button class="btn" data-a="continueNext">'+t("continueLessons",{n:S.nextLesson||2})+'</button></section>'}
-function courseDone(){bar(1);w.innerHTML='<section class="card"><h2>'+t("courseFinished")+'</h2><p>'+t("courseFinishedText")+'</p><a class="btn" href="index.html">'+t("home")+'</a></section>'}
+function lessonBreak(){bar(1);const perfect=S.lessonPerfect||S.lessonPoints===10;w.innerHTML='<section class="card"><h2>'+t("lessonFinished")+'</h2><p>'+t("lessonRest")+'</p><p>'+t(perfect?"lessonPerfect":"lessonScore",{n:S.lessonPoints??0})+'</p>'+(perfect?'<p>'+t("lessonLocked")+'</p>':'<p>'+t("lessonRetryHint")+'</p><button class="btn" data-a="retryLesson">'+t("lessonRetry")+'</button>')+'<p>'+t("nextLessonReady",{n:S.nextLesson||2})+'</p><p><a class="btn" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+'</a> <a class="btn ghost" href="tips.html">'+t("tips")+'</a></p></section>'}
+function courseDone(){bar(1);w.innerHTML='<section class="card"><h2>'+t("courseFinished")+'</h2><p>'+t("courseFinishedText")+'</p><p><a class="btn" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+'</a> <a class="btn ghost" href="tips.html">'+t("tips")+'</a></p><a class="btn ghost" href="index.html">'+t("home")+'</a></section>'}
 function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.phase==="lesson")return lesson();if(S.bank==="english"&&S.phase==="break")return lessonBreak();if(S.bank==="english"&&S.phase==="courseDone")return courseDone();if(S.bank==="english"&&S.d.o.length)return result();plan()}
 const legacy=ls("ep_flow",null);if(legacy&&legacy.bank==="english"&&!ls("ep_flow_en",null))save("ep_flow_en",legacy);if(legacy&&legacy.bank==="ielts"&&!ls("ep_flow_ielts",null))save("ep_flow_ielts",legacy);
-const resume=ls("ep_resume",0);const requestedCourse=new URLSearchParams(location.search).get("course")||(resume?ls("ep_active_course",""):"");if(resume)try{localStorage.removeItem("ep_resume")}catch{}const saved=ls(requestedCourse==="ielts"?"ep_flow_ielts":"ep_flow_en",null);
-if(saved&&saved.bank===(requestedCourse==="ielts"?"ielts":"english")){S=Object.assign(FRESH(),saved);save("ep_active_course",S.bank)}else if(requestedCourse==="ielts"){S.bank="ielts";save("ep_active_course","ielts")}
-route();
+(async()=>{if(!await BANDUP_SESSION_READY)return;const params=new URLSearchParams(location.search),resume=ls("ep_resume",0),requestedCourse=params.get("course")||(resume?ls("ep_active_course",""):"");if(resume)try{localStorage.removeItem("ep_resume")}catch{}const course=requestedCourse==="ielts"?"ielts":"english",local=ls(course==="ielts"?"ep_flow_ielts":"ep_flow_en",null);let remote=null;try{remote=(await api("/api/progress?course="+course)).progress}catch{}
+if(remote&&remote.bank===course)S=Object.assign(FRESH(),remote);else if(local&&local.bank===course)S=Object.assign(FRESH(),local);else if(requestedCourse){S.bank=course;save("ep_active_course",course)}
+if(!remote&&local&&local.bank===course)persist();const requestedLesson=Number(params.get("lesson"));if(Number.isInteger(requestedLesson)&&requestedLesson>=1&&requestedLesson<=10){S.bank="english";S.lessonNo=requestedLesson;S.lessonStep=0;S.lessonAnswers=[];delete S.lessonAnswered;S.lessonPerfect=false;S.phase="lesson";save("ep_active_course","english");persist()}
+route()})();
 </script></body></html>

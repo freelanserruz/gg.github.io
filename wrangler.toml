@@ -1,0 +1,11 @@
+name = "bandup"
+compatibility_date = "2026-11-23"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bandup-prod"
+database_id = "27562416-0a76-4b8d-bc1e-4c2fe1b367c5"
+
+[vars]
+ADMIN_USERNAME = "Ali"
