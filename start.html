@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=5"></script><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><div class="bar"><i id="pb"></i></div><div id="w"></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=6"></script><script>
 const FRESH=()=>({bank:"",i:0,ans:{},prog:0,phase:"survey",d:{i:0,s:0,w:[],o:[]}});
 let S=FRESH(),pool=[],pick=[];
 const T=(ks,p="q_")=>ks.map(k=>[k,t(p+k)]);
@@ -32,7 +32,7 @@ function survey(){const f=FLW();if(S.i>=f.length)return endSurvey();const d=D[f[
 w.innerHTML=stg(0)+'<p class="tag">'+t("q_step",{n:S.i+1})+"</p><h2>"+d.p+"</h2>"+d.o.map(([v,l])=>'<button class="opt" data-v="'+esc(v)+'">'+esc(l)+"</button>").join("")+'<p><button class="btn ghost" id="bk">'+t("back")+"</button></p>"}
 function endSurvey(){S.prog=1;if(S.bank==="english"){S.phase="diag";persist();return intro()}plan()}
 function intro(){bar(.4);w.innerHTML=stg(1)+"<h2>"+t("q_dt")+"</h2><p>"+t("q_dn")+'</p><button class="btn" data-a="ds">'+t("q_dstart")+"</button>"}
-function plan(extra=""){bar(1);S.phase="plan";persist();w.innerHTML=stg(2)+extra+"<h2>"+t("q_done")+"</h2><p>"+t("q_donep")+"</p><p>"+chips()+"</p>"+(S.bank==="ielts"?'<p class="tag">'+t("q_isoon")+"</p>":"")+'<p><a class="btn" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+"</a></p>"}
+function plan(extra=""){bar(1);S.phase="plan";persist();w.innerHTML=stg(2)+extra+"<h2>"+t("q_done")+"</h2><p>"+t("q_donep")+"</p><p>"+chips()+"</p>"+(S.bank==="ielts"?'<p class="tag">'+t("q_isoon")+"</p>":' <p><button class="btn" data-a="lesson">'+t("lessonStart")+"</button></p>")+'<p><a class="btn" href="games.html">'+t("games")+'</a> <a class="btn ghost" href="guides.html">'+t("guides")+"</a></p>"}
 const mc=(s,o,a,k)=>({h:t("q_choose"),t:s,o,a,k});
 const DQ=()=>[mc("I __ a student.",["am","is","are"],0,"tobe"),mc("She __ coffee every morning.",["drink","drinks","drinking"],1,"pres"),mc("They __ from Uzbekistan.",["is","are","am"],1,"tobe"),mc("We __ English yesterday.",["study","studied","studies"],1,"past"),mc("There __ a hotel near the station.",["is","are","am"],0,"there"),mc("I would like __ room, please.",["a","an","are"],0,"art"),mc("How __ to the airport?",["do I get","I get","am I get"],0,"qord"),mc("He __ to London last year.",["go","went","gone"],1,"past"),mc("I’m looking __ my passport.",["for","at","on"],0,"prep"),mc("If it rains, we __ a taxi.",["take","will take","took"],1,"cond"),mc("I have never __ sushi.",["eat","ate","eaten"],2,"perf"),mc("A hotel __ more expensive than a hostel.",["is","are","be"],0,"comp"),
 {h:t("q_q13"),t:"“Could you tell me when the next train leaves?”",o:[t("q_q13a"),t("q_q13b"),t("q_q13c")],a:0,k:"read"},
@@ -52,12 +52,15 @@ if(D0.b){S=FRESH();S.bank=D0.b;return survey()}
 if(b.id==="bk"){if(S.i===0){S.bank="";return course()}S.i--;return survey()}
 if(D0.v!==undefined){const k=FLW()[S.i];S.ans[k]=D0.v;S.i++;persist();if(k==="lang"&&D0.v!==lang){save("ep_lang",D0.v);save("ep_resume",1);return location.reload()}return survey()}
 if(D0.a==="ds"){S.d={i:0,s:0,w:[],o:[]};persist();return diag()}
+if(D0.a==="lesson"){S.phase="lesson";S.lessonNo=S.lessonNo||1;persist();return lesson()}
+if(D0.a==="nextLesson"){S.lessonNo=(S.lessonNo||1)+1;if(S.lessonNo>10)S.lessonNo=1;persist();return lesson()}
 if(D0.j!==undefined){const q=DQ()[S.d.i],j=+D0.j;w.querySelectorAll(".opt").forEach((x,n)=>{x.disabled=true;x.classList.toggle("ok",n===q.a);if(n===j&&j!==q.a)x.classList.add("bad")});return fin(j===q.a,q,"")}
 if(D0.p!==undefined){pick.push(pool.splice(+D0.p,1)[0]);return drawChips()}
 if(D0.r!==undefined){pool.push(pick.splice(+D0.r,1)[0]);return drawChips()}
 if(b.id==="ck"){const q=DQ()[S.d.i];b.disabled=true;w.querySelectorAll(".chip").forEach(x=>x.disabled=true);return fin(pick.join(" ")===q.ans,q,q.ans)}
 if(b.id==="nx"){S.d.i++;persist();return diag()}};
-function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.d.o.length)return result();plan()}
-if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}const f=ls("ep_flow",null);if(f&&f.bank)S=Object.assign(FRESH(),f)}
+function lesson(){bar(1);const lessons=[t("lesson1"),t("lesson2"),t("lesson3"),t("lesson4"),t("lesson5"),t("lesson6"),t("lesson7"),t("lesson8"),t("lesson9"),t("lesson10")];const n=Math.min(Math.max(S.lessonNo||1,1),10);w.innerHTML=stg(2)+"<h2>"+t("lessonTitle",{n})+"</h2><p>"+lessons[n-1]+"</p><p class=\"tag\">"+t("lessonCount",{n})+"</p><button class=\"btn\" data-a=\"nextLesson\">"+t("next")+"</button>"}
+function route(){if(!S.bank)return course();if(S.phase==="survey")return survey();if(S.phase==="diag")return S.d.i>0?diag():intro();if(S.bank==="english"&&S.phase==="lesson")return lesson();if(S.bank==="english"&&S.d.o.length)return result();plan()}
+const f=ls("ep_flow",null);if(f&&f.bank==="english"){S=Object.assign(FRESH(),f);try{localStorage.removeItem("ep_resume")}catch{}}else if(ls("ep_resume",0)){try{localStorage.removeItem("ep_resume")}catch{}if(f&&f.bank)S=Object.assign(FRESH(),f)}
 route();
 </script></body></html>
