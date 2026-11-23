@@ -1,0 +1,13 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body><main><h2 data-i="gt"></h2><p class="tag" data-i="gd"></p><div class="card" id="g"><button class="btn" id="st"></button></div></main><script src="app.js"></script><script>
+st.textContent=t("start");let n,sc,tm,cur;
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+st.onclick=()=>{n=0;sc=0;next()};
+function next(){clearTimeout(tm);if(n>=10)return fin();n++;cur=rnd(WORDS);
+const wr=WORDS.filter(x=>x!==cur).sort(()=>Math.random()-.5).slice(0,3),o=[cur,...wr].sort(()=>Math.random()-.5);
+g.innerHTML='<p class="tag">'+n+" / 10</p><h3>"+cur[0]+'</h3><div class="bar"><i id="br"></i></div>'+o.map(x=>'<button class="opt" data-w="'+x[1]+'">'+x[1]+"</button>").join("")+'<p id="m" class="tag"></p>';
+const br=document.getElementById("br");br.style.transition="transform 6s linear";requestAnimationFrame(()=>requestAnimationFrame(()=>br.style.transform="scaleX(0)"));
+tm=setTimeout(()=>{m.textContent=t("tu");lock();setTimeout(next,900)},6000)}
+function lock(){g.querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(b.dataset.w===cur[1])b.classList.add("ok")})}
+g.onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;clearTimeout(tm);const good=b.dataset.w===cur[1];if(good)sc++;else b.classList.add("bad");lock();setTimeout(next,700)};
+function fin(){const ok=addPoints(sc*10);g.innerHTML="<h3>"+t("res")+": "+sc+" / 10</h3><p>"+(ok?t("added",{n:sc*10}):t("need"))+'</p><button class="btn" id="st2">'+t("again")+"</button>";document.getElementById("st2").onclick=()=>{n=0;sc=0;next()}}
+</script></body></html>

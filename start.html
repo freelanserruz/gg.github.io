@@ -1,0 +1,14 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exam prep</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body><main><div id="w"></div></main><script src="app.js"></script><script>
+let bank="";const S={};
+function opts(keys,fn){return '<div class="row">'+keys.map(k=>'<button class="card" data-k="'+k+'">'+t(k)+"</button>").join("")+"</div>"}
+function step1(){w.innerHTML='<h2>'+t("s1")+'</h2><p class="tag">'+t("s1p")+'</p><button class="pick pv" data-b="english"><h3>'+t("eng")+'</h3><p>'+t("engd")+'</p></button><button class="pick pb" data-b="ielts"><h3>'+t("ielts")+'</h3><p>'+t("ieltsd")+'</p></button>'}
+function step2(){w.innerHTML='<h2>'+t("s2")+'</h2>'+opts(["g1","g2","g3","g4","g5"])+'<p><button class="btn ghost" id="bk">'+t("back")+'</button></p>'}
+function step3(){w.innerHTML='<h2>'+t("s3")+'</h2><div class="row"><button class="card" data-f="academic">Academic</button><button class="card" data-f="general">General Training</button></div><p><button class="btn ghost" id="bk">'+t("back")+'</button></p>'}
+w.onclick=e=>{const b=e.target.closest("button");if(!b)return;
+if(b.id==="bk")return step2.fn?step1():step1();
+if(b.dataset.b){bank=b.dataset.b;return bank==="ielts"?step2():go()}
+if(b.dataset.k){S.goal=b.dataset.k;return step3()}
+if(b.dataset.f){S.fmt=b.dataset.f;go()}};
+function go(){save("ep_plan",{bank,...S});location.href="test.html?bank="+bank}
+step1();
+</script></body></html>
