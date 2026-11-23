@@ -1,0 +1,9 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Подготовка к экзамену</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<main><section class="hero"><h1>Реши задачу прямо сейчас. Остальное подождёт.</h1><p>Тренажёры по экзаменам Узбекистана: вузы и колледжи. После каждого ответа видно, где ошибка и почему.</p>
+<div class="card" id="q"></div><a class="btn" href="exams.html">Выбрать экзамен</a></section></main>
+<script src="app.js"></script><script>
+const q=EXAMS.dtm.q[0],box=document.getElementById("q");
+box.innerHTML=`<h3>${q.t}</h3>`+q.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join("")+`<p id="r" class="tag" aria-live="polite"></p>`;
+box.onclick=e=>{const b=e.target.closest(".opt");if(!b)return;const i=+b.dataset.i;box.querySelectorAll(".opt").forEach((x,j)=>{x.classList.toggle("ok",j===q.a);if(j===i&&i!==q.a)x.classList.add("bad")});r.textContent=(i===q.a?"Верно. ":"Неверно. ")+q.e};
+</script></body></html>

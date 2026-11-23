@@ -1,0 +1,6 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Рейтинг</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<main><h2>Рейтинг</h2><div class="card"><table id="t"></table></div></main><script src="app.js"></script><script>
+const r=Object.entries(users()).sort((a,b)=>b[1]-a[1]);
+t.innerHTML=r.length?"<tr><th>#</th><th>Имя</th><th>Баллы</th></tr>"+r.map(([n,p],i)=>`<tr><td>${i+1}</td><td>${n.replace(/</g,"&lt;")}</td><td>${p}</td></tr>`).join(""):"<tr><td>Пока пусто. Пройдите тест, чтобы попасть в рейтинг.</td></tr>";
+</script></body></html>

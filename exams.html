@@ -1,0 +1,6 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Экзамены</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<main><h2>Выберите экзамен</h2><div id="l"></div><h3>Скоро</h3><div id="s"></div></main><script src="app.js"></script><script>
+l.innerHTML=Object.entries(EXAMS).map(([k,e])=>`<div class="card"><h3>${e.name}</h3><p class="tag">${e.q.length} вопроса в тренажёре</p><a class="btn" href="test.html?exam=${k}">Начать</a></div>`).join("");
+s.innerHTML=SOON.map(n=>`<div class="card soon">${n}</div>`).join("");
+</script></body></html>

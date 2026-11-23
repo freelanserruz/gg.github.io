@@ -1,0 +1,6 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админ-панель</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<main><h2>Админ-панель</h2><p class="tag">Демо: настоящая проверка прав админа появится вместе с базой данных и ботом.</p><div class="card"><table id="t"></table></div></main><script src="app.js"></script><script>
+function draw(){const u=users();t.innerHTML="<tr><th>Имя</th><th>Баллы</th><th></th></tr>"+Object.entries(u).map(([n,p])=>`<tr><td>${n.replace(/</g,"&lt;")}</td><td>${p}</td><td><button class="btn ghost" data-n="${encodeURIComponent(n)}" data-d="10">+10</button> <button class="btn ghost" data-n="${encodeURIComponent(n)}" data-d="-10">−10</button></td></tr>`).join("")}
+t.onclick=e=>{const b=e.target.closest("button");if(!b)return;const u=users(),n=decodeURIComponent(b.dataset.n);u[n]=Math.max(0,(u[n]||0)+ +b.dataset.d);save("ep_users",u);draw()};draw();
+</script></body></html>
