@@ -1,5 +1,5 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bandup</title><link rel="icon" type="image/svg+xml" href="bandup-icon.svg"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=5"></head><body><main><h2 data-i="login"></h2><div class="card"><p data-i="demo"></p>
-<input id="nm" data-p="nm" maxlength="20"> <button class="btn" id="go" data-i="login"></button> <button class="btn ghost" id="out" data-i="out"></button></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=6"></script><script>
+<input id="nm" data-p="nm" maxlength="20"> <button class="btn" id="go" data-i="login"></button> <button class="btn ghost" id="out" data-i="out"></button></div></main><script src="i18n2.js?v=5"></script><script src="i18n3.js?v=5"></script><script src="app.js?v=7"></script><script>
 go.onclick=()=>{const v=nm.value.trim();if(!v)return nm.focus();save("ep_user",{name:v});location.href="exams.html"};
 out.onclick=()=>{try{localStorage.removeItem("ep_user")}catch{}location.reload()};
 </script></body></html>
