@@ -78,7 +78,7 @@ window.BANDUP_SESSION_READY=(async()=>{
  const account=document.querySelector("header a[href='profile.html'],header a[href='login.html']");
  if(account){account.href=user?"profile.html":"login.html";account.textContent=user?user.name:t("login")}
  const page=location.pathname.split("/").pop()||"index.html";
- if(!user&&page!=="login.html"&&page!=="rating.html"&&page!=="guides.html")location.replace("login.html?next="+encodeURIComponent(location.pathname+location.search));
+ if(!user&&page!=="login"&&page!=="login.html"&&page!=="rating.html"&&page!=="guides.html")location.replace("login.html?next="+encodeURIComponent(location.pathname+location.search));
  return user;
 })();
 Object.assign(L.ru,{continueb:"Продолжить уроки",lessonStart:"Начать первый урок",lessonTitle:"Урок {n}",lessonCount:"Урок {n} из 10",lesson1:"Порядок слов: подлежащее, глагол, дополнение.",lesson2:"Глагол to be: am, is и are в простых предложениях.",lesson3:"Present Simple: привычки и окончание -s после he, she, it.",lesson4:"Вопросы и отрицания с do и does.",lesson5:"Present Continuous: действия, которые происходят сейчас.",lesson6:"Past Simple: правильные и неправильные глаголы.",lesson7:"Артикли a, an и the в повседневной речи.",lesson8:"Исчисляемые и неисчисляемые существительные: many и much.",lesson9:"Предлоги места и времени: in, on и at.",lesson10:"Повтори материал и составь короткий рассказ о своём дне."});
