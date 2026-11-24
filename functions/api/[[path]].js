@@ -1,6 +1,7 @@
 const SESSION_COOKIE = "bandup_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 14;
-const PASSWORD_ITERATIONS = 310000;
+// Cloudflare Workers WebCrypto rejects PBKDF2 iteration counts above 100,000.
+const PASSWORD_ITERATIONS = 100000;
 const TEST_MAXIMUMS = { dtm: 40, college: 30, english: 150, ielts: 150 };
 const TEST_ANSWERS = {
   dtm: [2, 1, 2, 1],
