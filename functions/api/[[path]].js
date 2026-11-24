@@ -100,18 +100,11 @@ async function register(request, env) {
   if (nameLength < 2 || nameLength > 20 || !/^[\p{L}\p{N}_ -]+$/u.test(name)) return fail("Имя должно содержать от 2 до 20 букв или цифр.");
   if (passwordLength < 8 || passwordLength > 128) return fail("Пароль должен содержать от 8 до 128 символов.");
 
-  const existingAdmin = await env.DB.prepare("SELECT id FROM users WHERE role='admin' LIMIT 1").first();
-  const wantsAdmin = normalizedName(env.ADMIN_USERNAME || "") === nameKey;
-  const adminKey = typeof body.adminKey === "string" ? body.adminKey : "";
-  if (wantsAdmin && !existingAdmin && (!env.ADMIN_SETUP_KEY || !constantTimeEqual(adminKey, env.ADMIN_SETUP_KEY))) {
-    return fail("Для этого имени нужен ключ настройки администратора.", 403);
-  }
-
   const salt = randomHex(16);
   const hash = await passwordHash(password, salt);
   const id = crypto.randomUUID();
   const now = Date.now();
-  const role = wantsAdmin && !existingAdmin ? "admin" : "student";
+  const role = "student";
   try {
     await env.DB.prepare("INSERT INTO users(id,name,name_key,password_salt,password_hash,role,created_at) VALUES(?,?,?,?,?,?,?)")
       .bind(id, name, nameKey, salt, hash, role, now).run();
@@ -120,6 +113,29 @@ async function register(request, env) {
   }
   const token = await createSession(env, id);
   return json({ user: { id, name, role, points: 0 } }, 201, { "set-cookie": sessionCookie(token) });
+}
+
+async function createAdmin(request, env) {
+  if (!await authRateAllowed(request, env, "owner-admin")) return fail("Слишком много попыток. Попробуйте позже.", 429);
+  let body;
+  try { body = await readBody(request); } catch { return fail("Проверьте введённые данные."); }
+  const ownerKey = typeof body.ownerKey === "string" ? body.ownerKey : "";
+  if (!env.ADMIN_SETUP_KEY || !constantTimeEqual(ownerKey, env.ADMIN_SETUP_KEY)) return fail("Неверный ключ владельца.", 403);
+  const name = typeof body.name === "string" ? body.name.normalize("NFKC").trim() : "";
+  const nameKey = normalizedName(name);
+  const password = typeof body.password === "string" ? body.password : "";
+  if (Array.from(name).length < 2 || Array.from(name).length > 20 || !/^[\p{L}\p{N}_ -]+$/u.test(name)) return fail("Имя должно содержать от 2 до 20 букв или цифр.");
+  if (Array.from(password).length < 8 || Array.from(password).length > 128) return fail("Пароль должен содержать от 8 до 128 символов.");
+  const salt = randomHex(16);
+  const hash = await passwordHash(password, salt);
+  const id = crypto.randomUUID();
+  try {
+    await env.DB.prepare("INSERT INTO users(id,name,name_key,password_salt,password_hash,role,created_at) VALUES(?,?,?,?,?,'admin',?)")
+      .bind(id, name, nameKey, salt, hash, Date.now()).run();
+  } catch {
+    return fail("Не удалось создать аккаунт. Возможно, это имя уже занято.", 409);
+  }
+  return json({ ok: true }, 201);
 }
 
 async function login(request, env) {
@@ -231,6 +247,7 @@ export async function onRequest({ request, env }) {
 
   try {
     if (method === "POST" && path === "/api/auth/register") return await register(request, env);
+    if (method === "POST" && path === "/api/owner/admins") return await createAdmin(request, env);
     if (method === "POST" && path === "/api/auth/login") return await login(request, env);
     if (method === "GET" && path === "/api/auth/me") return json({ user: await sessionUser(request, env) });
     if (method === "POST" && path === "/api/auth/logout") {
